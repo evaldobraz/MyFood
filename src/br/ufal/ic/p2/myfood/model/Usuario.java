@@ -1,23 +1,29 @@
 package br.ufal.ic.p2.myfood.model;
 
 public abstract class Usuario {
-    private final int id;
-    private static int proximoId = 0;
+    private int idUsuario = 0;
+    private static int proximoIdUsuario = 0;
     private String nome;
     private String email;
     private String senha;
     private String endereco;
 
+    public Usuario() {}
+
     public Usuario(String nome, String email, String senha, String endereco) {
-        id = proximoId++;
+        idUsuario = proximoIdUsuario++;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.endereco = endereco;
     }
 
-    public int getId() {
-        return this.id;
+    public int getIdUsuario() {
+        return this.idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNome() {

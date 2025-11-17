@@ -1,11 +1,11 @@
 package br.ufal.ic.p2.myfood.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import br.ufal.ic.p2.myfood.exception.DadoInvalidoException;
-import br.ufal.ic.p2.myfood.exception.EmailJaExisteException;
-import br.ufal.ic.p2.myfood.exception.LoginException;
-import br.ufal.ic.p2.myfood.exception.UsuarioNaoExisteException;
+import br.ufal.ic.p2.myfood.exception.*;
+import br.ufal.ic.p2.myfood.model.Cliente;
+import br.ufal.ic.p2.myfood.model.Empresa;
 import br.ufal.ic.p2.myfood.model.Empresario;
 import br.ufal.ic.p2.myfood.model.Usuario;
 
@@ -29,7 +29,7 @@ public class UsuarioService {
 
     public static Usuario getUsuarioPorId(int id, List<Usuario> usuarios) throws Exception {
         for(Usuario u : usuarios){
-            if(u.getId() == id){
+            if(u.getIdUsuario() == id){
                 return u;
             }
         }
@@ -39,7 +39,7 @@ public class UsuarioService {
     public static int login(String email, String senha, List<Usuario> usuarios) throws Exception {
         for(Usuario u : usuarios){
             if(u.getEmail().equals(email) && u.getSenha().equals(senha)){
-                return u.getId();
+                return u.getIdUsuario();
             }
         }
         throw new LoginException();
@@ -75,6 +75,24 @@ public class UsuarioService {
         if(cpf.length() != 14){
             throw new DadoInvalidoException("CPF");
         }
+    }
+
+    public static void verificarPermissoes(List<Usuario> usuarios, int idUsuario, String acao) throws Exception{
+        Usuario u = getUsuarioPorId(idUsuario, usuarios);
+        if(u instanceof Cliente && acao.equalsIgnoreCase("criar uma empresa")){
+            throw new UsuarioNaoAutorizadoException(acao);
+        }
+    }
+
+    public static String getEmpresasDoUsuario(int idUsuario, List<Empresa> empresas) throws Exception {
+        String DELIMITADOR = ", ";
+        String PREFIXO = "{[";
+        String SUFIXO = "]}";
+
+        return empresas.stream()
+                .filter(empresa -> empresa.getIdDono() == idUsuario)
+                .map(Empresa::toString)
+                .collect(Collectors.joining(DELIMITADOR, PREFIXO, SUFIXO));
     }
 
 }
